@@ -2,7 +2,7 @@
 {
     internal static class Program
     {/// <summary>
-     /// уээээээ
+     /// уэээээээээ
      /// </summary>
         private static void Main()
         {
