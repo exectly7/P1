@@ -1,7 +1,9 @@
 ﻿namespace P1
 {
     internal static class Program
-    {
+    {/// <summary>
+     /// уээээээ
+     /// </summary>
         private static void Main()
         {
             Console.WriteLine("Эта программа получает на вход 4 коэффициента и файл input с массивами и по формуле вычисляет значения для файла output");
