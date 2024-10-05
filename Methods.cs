@@ -181,39 +181,90 @@ namespace P1
         /// <param name="arrays">Массив строк даных input</param>
         /// <param name="arrayResult">Результирующий массив чисел double</param>
         /// <returns>true - если преобразование удалось или пользователя устраивает деление на 0, иначе false</returns>
+        // public static bool CreateResultArray(double[] coefficients, double[][] arrays, out double[][] arrayResult)
+        // {
+        //     arrayResult = new double[arrays.Length / 2][];
+        //     //каждая итерация цикл - одна основная задача (2 строки данных)
+        //     for (int i = 0; i < arrays.Length / 2; i++)
+        //     {
+        //         arrayResult[i] = new double[arrays[i].Length];
+        //         //каждый элемент j - одно число результирующего массива
+        //         for (int j = 0; j < arrays[i].Length; j++)
+        //         {
+        //             try
+        //             {
+        //                 arrayResult[i][j] = ((coefficients[0] * arrays[i * 2][j]) + coefficients[1]) /
+        //                                     ((arrays[(i * 2) + 1][j] * coefficients[2]) + coefficients[3]);
+        //             }
+        //             catch (OverflowException)
+        //             {
+        //                 Console.WriteLine("Данные неверны (переполнение типов)");
+        //                 return false;
+        //             }
+        //             catch (DivideByZeroException)
+        //             {
+        //                 Console.WriteLine("В файле присутствует деление на 0, вы хотите продолжить выполнение программы, тогда в соответсвующую ячейку будет записан 0?");
+        //                 Console.WriteLine("Для продолжения нажмите enter, иначе - любую клавишу: ");
+        //                 ConsoleKeyInfo continueIndicator = Console.ReadKey();
+        //                 if (continueIndicator.Key != ConsoleKey.Enter)
+        //                 {
+        //                     arrayResult[i][j] = 0;
+        //                 }
+        //                 else
+        //                 {
+        //                     arrayResult = [];
+        //                     return false;
+        //                 }
+        //             }
+        //         }
+        //         return true;
+        //     }
+        //}
         public static bool CreateResultArray(double[] coefficients, double[][] arrays, out double[][] arrayResult)
         {
-            arrayResult = new double[arrays.Length / 2][];
-            for (int i = 0; i < arrays.Length / 2; i++)
+            int numberOfPairs = arrays.Length / 2;
+            arrayResult = new double[numberOfPairs][];
+    
+            // Цикл проходит по парам строк данных
+            for (int i = 0; i < numberOfPairs; i++)
             {
-                arrayResult[i] = new double[arrays[i].Length];
-                for (int j = 0; j < arrays[i].Length; j++)
+                int lengthX = arrays[i * 2].Length;  // длина массива X
+                int lengthY = arrays[(i * 2) + 1].Length;  // длина массива Y
+        
+                // Проверка, что длины массивов совпадают
+                if (lengthX != lengthY)
                 {
-                    if ((arrays[i + 1][j] * coefficients[2]) + coefficients[3] != 0)
+                    Console.WriteLine("Размеры массивов X и Y не совпадают. Пропускаем эту пару данных.");
+                    arrayResult[i] = new double[0];  // Пустой результат для этой пары
+                    continue;  // Переход к следующей паре данных
+                }
+
+                arrayResult[i] = new double[lengthX];  // Создаем результирующий массив для этой пары
+
+                // Цикл по каждому элементу массива
+                for (int j = 0; j < lengthX; j++)
+                {
+                    try
                     {
-                        arrayResult[i][j] = ((coefficients[0] * arrays[i][j]) + coefficients[1]) / ((arrays[i + 1][j] * coefficients[2]) + coefficients[3]);
+                        arrayResult[i][j] = ((coefficients[0] * arrays[i * 2][j]) + coefficients[1]) /
+                                            ((arrays[(i * 2) + 1][j] * coefficients[2]) + coefficients[3]);
                     }
-                    else
+                    catch (DivideByZeroException)
                     {
-                        Console.WriteLine("В файле присутсвует деление на 0, вы хотите продолжить выполнение программы, тогда в соответсвующую ячейку будет записан 0?");
-                        Console.WriteLine("Для продолжения нажмите enter, иначе - любую клавишу: ");
-                        ConsoleKeyInfo continueIndicator = Console.ReadKey();
-                        if (continueIndicator.Key != ConsoleKey.Enter)
-                        {
-                            
-                            arrayResult[i][j] = 0;
-                        }
-                        else
-                        {
-                            arrayResult = [];
-                            return false;
-                        }
-                        
+                        Console.WriteLine("Деление на 0, устанавливаем результат в 0.");
+                        arrayResult[i][j] = 0;  // Если деление на 0, устанавливаем результат в 0
+                    }
+                    catch (OverflowException)
+                    {
+                        Console.WriteLine("Переполнение при вычислениях, устанавливаем результат в 0.");
+                        arrayResult[i][j] = 0;  // Если переполнение, также устанавливаем результат в 0
                     }
                 }
             }
+
             return true;
         }
+        
 
         /// <summary>
         /// Создает выходные файлы output и config
@@ -225,10 +276,11 @@ namespace P1
             try
             {
                 File.Delete("config.txt");
-                File.Create("config.txt");
+                File.WriteAllText("config.txt", "");
                 for (int i = 0; i < arrayResult.Length; i++)
                 {
                     string[] lines = Array.ConvertAll(arrayResult[i], x => x.ToString(CultureInfo.CurrentCulture));
+                    File.Delete($"output-{i + 1}.txt");
                     File.WriteAllLines($"output-{i + 1}.txt", lines);
                     File.AppendAllText("config.txt", $"Создан файл output-{i + 1}.txt");
                 }

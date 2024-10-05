@@ -23,7 +23,7 @@
                         {
                             if (Methods.CreateOutputFiles(arrayResult))
                             {
-                                
+                                Console.WriteLine("Данные успешно записаны");
                             }
                         }
                     }
