@@ -244,5 +244,20 @@ namespace P1
                 return false;
             }
         }
+
+        public static void ClearOutputFiles()
+        {
+            for (int i = 0;; i++)
+            {
+                if (File.Exists($"output-{i + 1}.txt"))
+                {
+                    File.Delete($"output-{i + 1}.txt");
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
     }
 }
