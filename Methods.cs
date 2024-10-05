@@ -86,6 +86,7 @@ namespace P1
         public static bool ReadInputData(out double[][] arrays)
         {
             string[] input = File.ReadAllLines("input.txt");
+            //Проверка на коректное количество строк
             if (input.Length % 2 != 0)
             {
                 Console.WriteLine(
@@ -97,7 +98,7 @@ namespace P1
                     return false;
                 }
             }
-
+            //Заполняем выходной массив данными при помощи метода ConvertData
             arrays = new double[input.Length / 2 * 2][];
             for (int i = 0; i < input.Length / 2; i++)
             {
@@ -109,13 +110,21 @@ namespace P1
             return true;
         }
 
+        /// <summary>
+        /// Метод преобразует строки файла в массивы чисел double
+        /// </summary>
+        /// <param name="input1">Входная строка 1</param>
+        /// <param name="input2">Входная строка 2</param>
+        /// <param name="arrayX">Выходной массив из 1 строки</param>
+        /// <param name="arrayY">Выходной массив из 2 строки</param>
         private static void ConvertData(string input1, string input2, out double[] arrayX, out double[] arrayY)
         {
             string[] formattedInput1 = input1.Split(' ');
             string[] formattedInput2 = input2.Split(' ');
             int correctValues1 = 0;
             int correctValues2 = 0;
-
+            
+            //Cчитаем количество корректных данных в каждой строке
             foreach (string t in formattedInput1)
             {
                 if (double.TryParse(t, out double _))
@@ -131,7 +140,8 @@ namespace P1
                     correctValues2++;
                 }
             }
-
+            
+            //Если количество корректных данных не совпадает, заполняем массивы элементами с нулем (по условию варианта)
             if (correctValues1 != correctValues2)
             {
                 arrayX = [0.0];
@@ -139,6 +149,7 @@ namespace P1
             }
             else
             {
+                //Заполняем массивы корректными данными
                 arrayX = new double[correctValues1];
                 arrayY = new double[correctValues1];
                 int counter1 = 0;
@@ -163,6 +174,13 @@ namespace P1
             }
         }
 
+        /// <summary>
+        /// Вычисляет итоговый массив по формуле индивидуального варианта
+        /// </summary>
+        /// <param name="coefficients">Введеные раннее коэффициенты abcd в массиве double</param>
+        /// <param name="arrays">Массив строк даных input</param>
+        /// <param name="arrayResult">Результирующий массив чисел double</param>
+        /// <returns>true - если преобразование удалось или пользователя устраивает деление на 0, иначе false</returns>
         public static bool CreateResultArray(double[] coefficients, double[][] arrays, out double[][] arrayResult)
         {
             arrayResult = new double[arrays.Length / 2][];
@@ -197,16 +215,22 @@ namespace P1
             return true;
         }
 
-        
+        /// <summary>
+        /// Создает выходные файлы output и config
+        /// </summary>
+        /// <param name="arrayResult">Массив итоговых данных, которые нужно записать в выходные файлы</param>
+        /// <returns>true - если запись удалась, иначе false</returns>
         public static bool CreateOutputFiles(double[][] arrayResult)
         {
             try
             {
+                File.Delete("config.txt");
+                File.Create("config.txt");
                 for (int i = 0; i < arrayResult.Length; i++)
                 {
                     string[] lines = Array.ConvertAll(arrayResult[i], x => x.ToString(CultureInfo.CurrentCulture));
-                    File.WriteAllLines($"output-{i}.txt", lines);
-                    File.AppendAllText("config.txt", $"Создан файл output-{i}.txt");
+                    File.WriteAllLines($"output-{i + 1}.txt", lines);
+                    File.AppendAllText("config.txt", $"Создан файл output-{i + 1}.txt");
                 }
                 return true;
             }
